@@ -1,26 +1,376 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-tet-red: #DC143C;
+  --color-tet-gold: #FFD700;
+  --color-tet-orange: #FFA500;
+  --color-tet-crimson: #8B0000;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+
+  /* Flash animation */
+  @keyframes flash {
+
+    0%,
+    100% {
+      opacity: 0;
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .animate-flash {
+    animation: flash 0.3s ease-in-out;
+  }
+
+  /* Bounce in animation */
+  @keyframes bounce-in {
+    0% {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+
+    50% {
+      transform: scale(1.05);
+    }
+
+    70% {
+      transform: scale(0.9);
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Confetti animation */
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confetti-fall 3s linear forwards;
+  }
+
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  /* Waterfall animation */
+  .waterfall-container {
+    overflow: hidden;
+    position: relative;
+    height: 200px;
+    padding: 16px;
+  }
+
+  .waterfall-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .waterfall-item {
+    white-space: nowrap;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+    animation: waterfall-slide 0.5s ease-out;
+  }
+
+  @keyframes waterfall-slide {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .waterfall-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3));
+    pointer-events: none;
+  }
+
+  /* Glitch effect */
+  @keyframes glitch {
+
+    0%,
+    100% {
+      transform: translate(0);
+    }
+
+    20% {
+      transform: translate(-2px, 2px);
+    }
+
+    40% {
+      transform: translate(-2px, -2px);
+    }
+
+    60% {
+      transform: translate(2px, 2px);
+    }
+
+    80% {
+      transform: translate(2px, -2px);
+    }
+  }
+
+  .animate-glitch {
+    animation: glitch 0.3s ease-in-out infinite;
+  }
+
+  /* Spin animation */
+  @keyframes spin-wheel {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-wheel {
+    animation: spin-wheel 0.5s linear infinite;
+  }
+
+  /* Vietnamese Lunar New Year Animations */
+  @keyframes golden-glow {
+
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5),
+        0 0 40px rgba(255, 215, 0, 0.3),
+        0 0 60px rgba(255, 215, 0, 0.2);
+    }
+
+    50% {
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8),
+        0 0 60px rgba(255, 215, 0, 0.5),
+        0 0 90px rgba(255, 215, 0, 0.3);
+    }
+  }
+
+  .animate-golden-glow {
+    animation: golden-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes float-lantern {
+    0% {
+      transform: translateY(100vh) translateX(0) rotate(0deg);
+      opacity: 0;
+    }
+
+    10% {
+      opacity: 1;
+    }
+
+    90% {
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateY(-100px) translateX(50px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  .animate-float-lantern {
+    animation: float-lantern 15s ease-in-out infinite;
+  }
+
+  @keyframes coin-rain {
+    0% {
+      transform: translateY(-100px) rotate(0deg);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0.5;
+    }
+  }
+
+  .animate-coin-rain {
+    animation: coin-rain 3s linear infinite;
+  }
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      transform: scale(1);
+      filter: brightness(1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+    }
+
+    50% {
+      transform: scale(1.05);
+      filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 215, 0, 0.3),
+        transparent);
+    background-size: 1000px 100%;
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shake-excitement {
+
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(5px);
+    }
+  }
+
+  .animate-shake-excitement {
+    animation: shake-excitement 0.5s ease-in-out;
+  }
+
+  @keyframes zoom-in-out {
+
+    0%,
+    100% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.1);
+    }
+  }
+
+  .animate-zoom-in-out {
+    animation: zoom-in-out 0.8s ease-in-out infinite;
+  }
+
+  @keyframes firework {
+    0% {
+      transform: translate(0, 0) scale(0);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translate(var(--tx), var(--ty)) scale(1);
+      opacity: 0;
+    }
+  }
+
+  .firework-particle {
+    animation: firework 1s ease-out forwards;
+  }
+
+  /* Background pattern */
+  .tet-pattern {
+    background-image:
+      repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 215, 0, 0.05) 35px, rgba(255, 215, 0, 0.05) 70px),
+      repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 0, 0, 0.05) 35px, rgba(255, 0, 0, 0.05) 70px);
+  }
+
+  /* Lucky money envelope effect */
+  @keyframes envelope-open {
+    0% {
+      transform: rotateX(0deg);
+    }
+
+    50% {
+      transform: rotateX(90deg);
+    }
+
+    100% {
+      transform: rotateX(180deg);
+    }
+  }
+
+  .animate-envelope-open {
+    animation: envelope-open 1s ease-in-out;
+  }
+
+  /* Custom Scrollbar for Premium Feel */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.4);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.6);
+  }
 }
