@@ -17,6 +17,18 @@ export default function ModeToggle({ currentMode, onModeChange, onSpinStart, onS
     return (
         <div className="w-full max-w-2xl mx-auto mb-8">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <div className="mb-4">
+                    <label htmlFor="roomCode" className="block text-sm font-medium text-white/70 mb-1">
+                        Mã phòng:
+                    </label>
+                    <input
+                        type="text"
+                        id="roomCode"
+                        value="UDWEZNK"
+                        readOnly
+                        className="w-full px-4 py-2 rounded-lg border border-white/20 bg-white/10 text-white/60 text-sm font-mono cursor-not-allowed"
+                    />
+                </div>
                 <div className="flex gap-4 mb-4">
                     <button
                         onClick={() => onModeChange('real')}
