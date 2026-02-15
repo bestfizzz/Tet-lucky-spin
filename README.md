@@ -1,73 +1,55 @@
 # 🎊 Vòng Quay May Mắn Tết 2026
 
-A humorous "rigged" lucky spin wheel where users always win 1k VND despite visual trickery. Built with Next.js 15, Firebase Firestore, and browser fingerprinting.
+A humorous "rigged" lucky spin wheel where users always win 1K VND despite the wheel being full of high-value prizes. Built with Next.js 15, Firebase Firestore, and steganographic security.
 
-## Features
+## ✨ Features
 
-- 🎰 **Rigged Wheel Animation**: Suspenseful spin that always lands on 1k
-- 🔒 **Real Mode**: One spin per person (server-verified via fingerprint + Firestore)
-- 🎮 **Local Mode**: Unlimited testing spins (browser-only, no server)
-- 🎊 **Recent Rolls Waterfall**: Real-time display of recent spins
-- 🛡️ **Rate Limiting**: IP-based protection against spam
-- 🍪 **Cookie Persistence**: Fingerprint stored for session tracking
-- 📱 **Responsive Design**: Works on all devices
+- 🎰 **Rigged Wheel Animation** — 3 troll strategies (Fake Jackpot, Slow Creep, Double Betrayal) that always land on 1K
+- 🔐 **UIA Security** — Session token hidden inside a JPEG image via steganography
+- 🧬 **Browser Fingerprinting** — Canvas, screen, navigator, device memory, touch points
+- 🛡️ **Service Worker Cache** — UIA image fetched once, cached forever via SW
+- 🎮 **Dual Mode** — Real (server-verified, one spin per device) + Local (unlimited testing)
+- 🎵 **Background Music** — Thần Tài Đến on page load
+- 📱 **Responsive** — Works on all devices
+- 🔥 **Firestore** — Spin records persisted server-side
 
-## Tech Stack
+## 🛠 Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Database**: Firebase Firestore
-- **Fingerprinting**: Browser APIs + Canvas fingerprinting
-- **Validation**: Zod
-- **Hashing**: js-sha256
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Database | Firebase Firestore |
+| Validation | Zod |
+| Hashing | js-sha256 |
+| Caching | Service Worker (Cache Storage) |
 
-## Setup Instructions
+## 🚀 Setup
 
-### 1. Install Dependencies
+### 1. Install
 
 ```bash
 npm install
 ```
 
-### 2. Configure Firebase
+### 2. Configure Environment
 
-1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+```bash
+cp .env.example .env.local
+```
+
+Fill in your Firebase credentials (see `.env.example` for details).
+
+### 3. Firebase Setup
+
+1. Create a project at [console.firebase.google.com](https://console.firebase.google.com)
 2. Enable Firestore Database
 3. Generate a service account key:
-   - Go to Project Settings → Service Accounts
-   - Click "Generate New Private Key"
-4. Copy the credentials to `.env.local`:
+   - Project Settings → Service Accounts → Generate New Private Key
+4. Copy credentials to `.env.local`
 
-```env
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----END PRIVATE KEY-----\n"
-```
-
-### 3. Set Up Firestore Security Rules
-
-In Firebase Console → Firestore Database → Rules:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /spins/{fingerprintHash} {
-      allow read: if true;
-      allow create: if request.resource.data.amount == 1000
-                    && request.resource.data.name is string
-                    && request.resource.data.createdAt == request.time;
-      allow update, delete: if false;
-    }
-  }
-}
-```
-
-### 4. Run Development Server
+### 4. Run
 
 ```bash
 npm run dev
@@ -75,154 +57,77 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### 5. Build for Production
-
-```bash
-npm run build
-npm start
-```
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 lucky-spin/
 ├── app/
 │   ├── actions/
-│   │   ├── spin.ts              # Server Action for spin logic
-│   │   └── get-spin.ts          # Server Action to fetch existing spin
+│   │   ├── spin.ts              # Server Action — spin logic + Firestore write
+│   │   ├── get-spin.ts          # Check if user already spun (cookie + Firestore)
+│   │   └── get-all-spins.ts     # Fetch all spins (admin)
+│   ├── api/
+│   │   └── getUIA/route.ts      # GET endpoint — generates JPEG with hidden token
+│   ├── assmin/
+│   │   └── page.tsx             # Admin page — view all spin records
 │   ├── components/
-│   │   ├── ModeToggle.tsx       # Real/Local mode switcher
-│   │   ├── PageContent.tsx      # Main page orchestrator
-│   │   ├── RecentRolls.tsx      # Waterfall display of recent spins
-│   │   ├── WheelCanvas.tsx      # Rigged wheel animation
-│   │   ├── SpinForm.tsx         # Name input + spin button
-│   │   └── ResultModal.tsx      # Congratulations modal
-│   ├── globals.css              # Tailwind + custom animations
-│   ├── layout.tsx               # Root layout
-│   └── page.tsx                 # Server-side entry point
+│   │   ├── PageContent.tsx      # Main orchestrator (SW registration, UIA fetch, audio)
+│   │   ├── ModeToggle.tsx       # Real/Local mode switcher + SpinForm container
+│   │   ├── SpinForm.tsx         # Name input + spin button + token extraction
+│   │   ├── WheelCanvas.tsx      # Canvas wheel with troll animation strategies
+│   │   ├── ResultModal.tsx      # Congratulations modal
+│   │   └── RecentRolls.tsx      # Waterfall display of recent spins
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx                 # Server-side entry (cookie check + Firestore lookup)
 ├── lib/
-│   ├── firebase-admin.ts        # Firebase Admin SDK (server)
+│   ├── firebase-admin.ts        # Firebase Admin SDK (server-only)
 │   ├── firebase-client.ts       # Firebase Client SDK
 │   ├── fingerprint.ts           # Browser fingerprint collection
-│   ├── fingerprint-hash.ts      # SHA-256 hashing
-│   ├── rate-limit.ts            # IP-based rate limiting
-│   ├── get-client-ip.ts         # Extract client IP from headers
+│   ├── fingerprint-hash.ts      # Encoding, decoding, hashing, validation
 │   ├── cookies.ts               # Fingerprint cookie management
-│   └── recent-rolls.ts          # Roll display utilities
-├── .env.local                   # Environment variables (not in git)
-└── next.config.ts               # Next.js configuration
+│   └── recent-rolls.ts          # Local roll history utilities
+├── public/
+│   ├── sw.js                    # Service Worker — caches UIA image
+│   ├── UIIA.jpg                 # Base image for UIA steganography
+│   └── Thần Tài Đến.mp3        # Background music
+└── .env.local                   # Environment variables (not in git)
 ```
 
-## How It Works
+## 🔐 Security Flow (UIA)
 
-### Real Mode Flow
+| Step | What happens | Token visible? |
+|---|---|---|
+| **Page load** | Fingerprint collected → `GET /api/getUIA?asset=<encoded>` → SW caches response | ❌ No |
+| **Browsing** | Image in SW Cache Storage. Nothing in JS, localStorage, or React state | ❌ No |
+| **Spin click** | SpinForm re-fetches (SW returns cached) → reads last 64 bytes → extracts token | ✅ Briefly |
+| **Server validates** | Recomputes `SHA256(fingerprint + SERVER_SECRET)` → compares with token | — |
 
-1. User enters name and clicks "QUAY NGAY!"
-2. Browser collects fingerprint (canvas, screen, navigator APIs)
-3. Fingerprint sent to Server Action
-4. Server generates SHA-256 hash of fingerprint
-5. Server checks Firestore for existing spin with that hash
-6. If exists: "Bạn tham quá 😏" (already spun)
-7. If new: Create Firestore document, set cookie, return success
-8. Wheel animates with suspense → flash → snap to 1k
-9. Result modal shows "Chúc mừng bạn đã trúng 1k! 🎉"
+- ✅ No token in localStorage
+- ✅ No token in React state until spin
+- ✅ No obvious API returning a token (looks like a JPEG request)
+- ✅ Token bound to device fingerprint
+- ✅ Stateless server verification
 
-### Local Mode Flow
+## 🎡 Animation Strategies
 
-1. User enters name and clicks "QUAY NGAY!"
-2. Skip Server Action entirely
-3. Store spin in localStorage
-4. Trigger wheel animation
-5. Show result with spin count
-6. Allow unlimited spins
+The wheel always lands on 1K, but uses random strategies to create suspense:
 
-### Fingerprint Components
+1. **Fake Jackpot Panic** — Spins toward 500K, pauses, flashes, then snaps to 1K
+2. **Cruel Slow Creep** — Overshoots past 1K, slowly creeps back
+3. **Double Betrayal** — Lands on 500K, reverses to 200K, then snaps to 1K
 
-- User Agent
-- Platform
-- Language
-- Timezone
-- Screen dimensions (width, height, color depth)
-- Hardware concurrency
-- Device memory
-- Max touch points
-- Canvas fingerprint (rendered text → base64)
+## 📊 Admin
 
-### Rate Limiting
+Visit `/assmin` to view all spin records (name, amount, time).
 
-- 10 requests per 60 seconds per IP
-- In-memory Map tracking
-- Automatic cleanup of old entries
+## 🚀 Deployment (Vercel)
 
-## Testing Checklist
-
-### Real Mode
-- [ ] First spin succeeds
-- [ ] Second spin shows "Bạn tham quá 😏"
-- [ ] Cookie persists after refresh
-- [ ] Rate limit blocks after 10 requests
-- [ ] Recent rolls update in real-time
-
-### Local Mode
-- [ ] Unlimited spins allowed
-- [ ] Spin counter increments
-- [ ] localStorage persists after refresh
-- [ ] Reset button clears history
-- [ ] Recent rolls show local spins
-
-### Animation
-- [ ] Wheel spins smoothly
-- [ ] Suspense effect near high values
-- [ ] White flash on completion
-- [ ] Always lands on 1k
-- [ ] Confetti in result modal
-
-## Deployment
-
-### Vercel (Recommended)
-
-1. Push code to GitHub
-2. Import project in Vercel
+1. Push to GitHub
+2. Import in Vercel
 3. Add environment variables in Vercel dashboard
 4. Deploy
-
-### Firebase Hosting
-
-```bash
-npm run build
-firebase deploy
-```
-
-## Security Notes
-
-- Firebase Admin credentials are server-side only
-- Private keys never exposed to client
-- Rate limiting prevents spam
-- Firestore rules enforce 1k amount
-- Fingerprint hash prevents easy replay attacks
-
-## Troubleshooting
-
-**Build fails with Firebase errors:**
-- Check `.env.local` has all required variables
-- Ensure private key is properly escaped with `\n`
-
-**"Bạn tham quá" on first spin:**
-- Clear cookies
-- Check Firestore for existing document with your fingerprint hash
-
-**Recent rolls not updating:**
-- Check Firebase client config
-- Verify Firestore rules allow reads
-- Check browser console for errors
-
-**Rate limit too aggressive:**
-- Adjust limits in `lib/rate-limit.ts` (default: 10 req/60s)
 
 ## License
 
 MIT
-
-## Credits
-
-Built following the implementation plan for a humorous rigged lucky spin wheel with dual-mode support.
