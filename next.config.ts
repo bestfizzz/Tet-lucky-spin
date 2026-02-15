@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+
+  compiler: {
+    removeConsole: {
+      exclude: ['error'], // giữ lại console.error
+    },
+  },
 };
 
 export default nextConfig;
