@@ -130,17 +130,42 @@ export function generateFingerprintHash(rawFingerprint: RawFingerprint): string 
         throw new Error(validation.reason || 'Invalid fingerprint');
     }
 
-    // Normalize and create canonical string
+    // 1. Coarsen User Agent to ignore browser version/name differences
+    // Extract the system part (usually inside first parentheses)
+    const ua = rawFingerprint.userAgent;
+    const systemMatch = ua.match(/\(([^)]+)\)/);
+    let systemInfo = systemMatch ? systemMatch[1] : ua;
+
+    // Further normalize systemInfo: remove specific build numbers or minor versions
+    // Example: "iPhone; CPU iPhone OS 15_4_1" -> "iPhone; CPU iPhone OS 15.4"
+    // Example: "Android 11; SM-G960F" -> keep
+    systemInfo = systemInfo.replace(/[\d._]{3,}/g, (match) => {
+        const parts = match.split(/[._]/);
+        if (parts.length > 2) {
+            return parts.slice(0, 2).join('.');
+        }
+        return match;
+    });
+
+    // 2. Normalize Screen Dimensions (Orientation agnostic)
+    const sw = rawFingerprint.screenWidth;
+    const sh = rawFingerprint.screenHeight;
+    const resolution = `${Math.min(sw, sh)}x${Math.max(sw, sh)}`;
+
+    // 3. Create canonical normalized object
     const normalized = {
-        userAgent: rawFingerprint.userAgent.trim(),
+        systemInfo: systemInfo.trim(),
         platform: rawFingerprint.platform.trim().toLowerCase(),
         language: rawFingerprint.language.trim().toLowerCase(),
         timeZone: rawFingerprint.timeZone.trim(),
-        hasScreen: true, // We already validated dimensions are positive
+        resolution,
         colorDepth: rawFingerprint.colorDepth,
         hardwareConcurrency: rawFingerprint.hardwareConcurrency || 0,
         deviceMemory: rawFingerprint.deviceMemory || 0,
         maxTouchPoints: rawFingerprint.maxTouchPoints,
+        // Canvas is kept but it's the most "browser-sensitive" part.
+        // On iOS all browsers use WebKit, so this is stable cross-browser.
+        // On Android, most use Blink, so it's also quite stable.
         canvasFingerprint: rawFingerprint.canvasFingerprint,
     };
 

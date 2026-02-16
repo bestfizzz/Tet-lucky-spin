@@ -171,7 +171,7 @@ export default function ResultModal({ isOpen, amount, name, onClose, mode, spinC
                                             src="https://www.youtube.com/embed/Snv4DIwCP0c?autoplay=1&loop=1&playlist=Snv4DIwCP0c&controls=0&mute=0"
                                             title="Evidence"
                                             frameBorder="0"
-                                            allow="autoplay"
+                                            allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                             className="grayscale aspect-square object-cover"
                                         ></iframe>
                                     </div>

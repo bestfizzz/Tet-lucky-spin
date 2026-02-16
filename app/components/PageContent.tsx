@@ -27,18 +27,24 @@ export default function PageContent({ existingSpin }: PageContentProps) {
         audio.volume = 0.3;
         audioRef.current = audio;
 
-        // Try autoplay immediately
-        const tryPlay = () => {
-            audio.play().catch(() => {
-                // Browser blocked autoplay — play on first interaction
-                const playOnInteraction = () => {
-                    audio.play();
-                    document.removeEventListener('click', playOnInteraction);
-                    document.removeEventListener('touchstart', playOnInteraction);
+        // Try autoplay logic
+        const tryPlay = async () => {
+            try {
+                await audio.play();
+            } catch (err) {
+                // Autoplay blocked — wait for first interaction
+                const resumeOnInteraction = async () => {
+                    try {
+                        await audio.play();
+                        document.removeEventListener('click', resumeOnInteraction);
+                        document.removeEventListener('touchstart', resumeOnInteraction);
+                    } catch (e) {
+                        // Still failing, ignore to avoid console noise
+                    }
                 };
-                document.addEventListener('click', playOnInteraction);
-                document.addEventListener('touchstart', playOnInteraction);
-            });
+                document.addEventListener('click', resumeOnInteraction);
+                document.addEventListener('touchstart', resumeOnInteraction);
+            }
         };
 
         tryPlay();
@@ -95,6 +101,8 @@ export default function PageContent({ existingSpin }: PageContentProps) {
     const handleSpinStart = () => {
         setIsSpinning(true);
         setShowResult(false);
+        // Ensure audio is playing after user interaction
+        audioRef.current?.play().catch(() => { });
     };
 
     const handleSpinComplete = () => {

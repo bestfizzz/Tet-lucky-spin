@@ -1,6 +1,7 @@
 'use server';
 
 import { getFirestoreAdmin } from '@/lib/firebase-admin';
+import { connection } from 'next/server'; // New recommended API
 
 export interface SpinRecord {
     id: string;
@@ -10,6 +11,9 @@ export interface SpinRecord {
 }
 
 export async function getAllSpins(): Promise<SpinRecord[]> {
+    // Calling this ensures the function is always dynamic
+    await connection();
+
     const db = getFirestoreAdmin();
     const snapshot = await db.collection('spins').orderBy('createdAt', 'desc').get();
 

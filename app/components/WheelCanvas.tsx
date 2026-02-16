@@ -84,13 +84,22 @@ export default function WheelCanvas({ isSpinning, onSpinComplete, targetAmount }
     const isReversingRef = useRef(false);
     const audioContextRef = useRef<AudioContext | null>(null);
 
-    // Generate tick sound using Web Audio API
-    const playTick = (isReverse = false) => {
+    // Resume AudioContext on user interaction
+    const resumeAudio = async () => {
         if (!audioContextRef.current) {
             audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
         }
+        if (audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+        }
+    };
 
+    // Generate tick sound using Web Audio API
+    const playTick = (isReverse = false) => {
+        if (!audioContextRef.current) return;
         const ctx = audioContextRef.current;
+        if (ctx.state !== 'running') return;
+
         const oscillator = ctx.createOscillator();
         const gainNode = ctx.createGain();
 
@@ -132,8 +141,10 @@ export default function WheelCanvas({ isSpinning, onSpinComplete, targetAmount }
 
     useEffect(() => {
         if (isSpinning) {
-            startSpinAnimation();
-            createParticles();
+            resumeAudio().then(() => {
+                startSpinAnimation();
+                createParticles();
+            });
         }
     }, [isSpinning]);
 

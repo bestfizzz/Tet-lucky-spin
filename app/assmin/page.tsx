@@ -1,4 +1,5 @@
 import { getAllSpins } from '@/app/actions/get-all-spins';
+export const dynamic = 'force-dynamic';
 
 export default async function AssminPage() {
     const spins = await getAllSpins();
